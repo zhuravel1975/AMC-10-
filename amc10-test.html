@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMC 10 Practice Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1d2433;--mute:#667085;--line:#e3e6ec;--bg:#f7f8fa;--card:#fff;--acc:#1f4fd1;--ok:#14804a;--bad:#c2341f;--blank:#9a6b00}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+.wrap{max-width:820px;margin:0 auto;padding:24px 18px 60px}
+h1{font-family:"Source Serif 4",serif;font-weight:600;font-size:30px;margin:0 0 6px}
+.sub{color:var(--mute);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.btn{font:inherit;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 18px;border-radius:10px;cursor:pointer}
+.btn:hover{border-color:#b8c0cc}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+ul.rules{padding-left:20px;margin:12px 0 20px}
+ul.rules li{margin:4px 0}
+.ru{color:var(--mute);font-size:14px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.timer{font-variant-numeric:tabular-nums;font-weight:600;font-size:20px;padding:6px 12px;border-radius:8px;background:#fff;border:1px solid var(--line)}
+.timer.low{color:var(--bad);border-color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(13,1fr);gap:5px;margin-bottom:16px}
+.grid button{font:inherit;font-size:13px;padding:6px 0;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.grid button.ans{background:#e6edff;border-color:#a9bdf5}
+.grid button.cur{outline:2px solid var(--acc)}
+.grid button.ok{background:#dff3e7;border-color:#8fd0aa}
+.grid button.bad{background:#fbe3df;border-color:#eba497}
+.qnum{font-size:13px;color:var(--mute);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.qtext{font-family:"Source Serif 4",serif;font-size:20px;margin:8px 0 18px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-family:"Source Serif 4",serif;font-size:18px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+.opt:hover{border-color:#b8c0cc}
+.opt .l{font-family:Inter,sans-serif;font-weight:600;font-size:14px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);flex:none}
+.opt.sel{border-color:var(--acc);background:#f1f5ff}
+.opt.sel .l{background:var(--acc);color:#fff;border-color:var(--acc)}
+.opt.right{border-color:var(--ok);background:#effaf3}
+.opt.right .l{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:#fdf1ef}
+.opt.wrong .l{background:var(--bad);color:#fff;border-color:var(--bad)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:18px;flex-wrap:wrap}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;font-size:.92em;line-height:1.15}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.fr>span:last-child{padding:0 3px}
+.score{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+.stat{flex:1;min-width:110px;background:var(--bg);border-radius:10px;padding:12px}
+.stat b{display:block;font-size:26px}
+.stat span{color:var(--mute);font-size:13px}
+.sol{margin-top:14px;padding:14px;border-left:3px solid var(--acc);background:#f6f8fe;border-radius:0 10px 10px 0;font-size:16px}
+.sol h4{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--acc)}
+.verdict{font-weight:600;margin-left:8px}
+.key{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-variant-numeric:tabular-nums}
+.key div{background:var(--bg);border-radius:6px;padding:6px 8px;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(20,24,33,.45);display:none;align-items:center;justify-content:center;padding:18px}
+.modal.on{display:flex}
+.modal .card{max-width:420px}
+@media(max-width:600px){.grid{grid-template-columns:repeat(9,1fr)}.qtext{font-size:18px}.key{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="modal" id="modal"><div class="card"><p id="mtext" style="margin-top:0"></p><div class="nav" style="justify-content:flex-end"><button class="btn" id="mno">Keep working</button><button class="btn pri" id="myes">Submit</button></div></div></div>
+<script>
+const Q = [{"q": "What is the value of 2·(3 + 4)<sup>2</sup> − 5·(6 − 8)<sup>3</sup>?", "o": ["58", "158", "118", "98", "138"], "a": 4, "s": "First the brackets: 3 + 4 = 7 and 6 − 8 = −2. Then the powers: 7<sup>2</sup> = 49 and (−2)<sup>3</sup> = −8. So we get 2·49 − 5·(−8) = 98 + 40 = 138."}, {"q": "A shirt costs $40. Its price is reduced by 25%, and later the sale price is increased by 20%. What is the final price of the shirt, in dollars?", "o": ["36", "40", "35", "38", "34"], "a": 0, "s": "After a 25% discount the price is 40 · 0.75 = 30 dollars. A 20% increase of 30 gives 30 · 1.2 = 36 dollars. Notice that the final price is not $40 — the percentages are taken from different amounts."}, {"q": "The average of five numbers is 12. When one of the numbers is removed, the average of the remaining four numbers is 10. Which number was removed?", "o": ["14", "16", "20", "18", "22"], "a": 2, "s": "The sum of five numbers is 5 · 12 = 60. The sum of the remaining four is 4 · 10 = 40. The removed number is 60 − 40 = 20."}, {"q": "How many positive integers less than 100 are divisible by 3 or by 5, but not by both?", "o": ["37", "34", "43", "40", "46"], "a": 3, "s": "Multiples of 3 below 100: 33. Multiples of 5: 19. Multiples of both, that is of 15: 6. Numbers divisible by exactly one of them: 33 + 19 − 2·6 = 40. We subtract the 6 twice, because they were counted in both groups and we do not want them at all."}, {"q": "A rectangle has perimeter 34 and a diagonal of length 13. What is the area of the rectangle?", "o": ["56", "50", "72", "64", "60"], "a": 4, "s": "Let the sides be l and w. Then l + w = 17 and, by the Pythagorean theorem, l<sup>2</sup> + w<sup>2</sup> = 169. Squaring the first equation: (l + w)<sup>2</sup> = 289 = l<sup>2</sup> + w<sup>2</sup> + 2lw, so 2lw = 289 − 169 = 120 and the area lw = 60."}, {"q": "Anna walks to a store at 3 km/h and returns along the same road at 6 km/h. What is her average speed for the whole trip, in km/h?", "o": ["4", "6", "5.5", "4.5", "5"], "a": 0, "s": "Average speed is total distance divided by total time — not the average of the two speeds. Say the road is 6 km. Going takes 2 hours, returning takes 1 hour. Total: 12 km in 3 hours, so the average speed is 4 km/h."}, {"q": "What is the least positive integer n such that 12n is a perfect cube?", "o": ["36", "18", "6", "144", "12"], "a": 1, "s": "12 = 2<sup>2</sup> · 3. In a perfect cube every prime exponent is a multiple of 3. We need one more 2 and two more 3s: n = 2 · 3<sup>2</sup> = 18. Check: 12 · 18 = 216 = 6<sup>3</sup>."}, {"q": "What is the sum of the digits of 10<sup>25</sup> − 25?", "o": ["216", "210", "222", "219", "213"], "a": 3, "s": "Look at small cases: 10<sup>4</sup> − 25 = 9975. In general 10<sup>25</sup> − 25 is a 25-digit number: 23 nines followed by 7 and 5. The digit sum is 23 · 9 + 7 + 5 = 207 + 12 = 219."}, {"q": "Two fair six-sided dice are rolled. What is the probability that the sum of the numbers is a prime number?", "o": ["<span class=\"fr\"><span>4</span><span>9</span></span>", "<span class=\"fr\"><span>1</span><span>3</span></span>", "<span class=\"fr\"><span>5</span><span>12</span></span>", "<span class=\"fr\"><span>7</span><span>18</span></span>", "<span class=\"fr\"><span>1</span><span>2</span></span>"], "a": 2, "s": "There are 36 equally likely outcomes. Prime sums: 2 (1 way), 3 (2 ways), 5 (4 ways), 7 (6 ways), 11 (2 ways). That is 15 ways, so the probability is <span class=\"fr\"><span>15</span><span>36</span></span> = <span class=\"fr\"><span>5</span><span>12</span></span>."}, {"q": "A circle is inscribed in an equilateral triangle with side length 6. What is the area of the region inside the triangle but outside the circle?", "o": ["18√3 − 3π", "9√3 − 4π", "9√3 − π", "12√3 − 3π", "9√3 − 3π"], "a": 4, "s": "The area of the triangle is <span class=\"fr\"><span>√3</span><span>4</span></span> · 36 = 9√3. Its height is 3√3, and the incenter divides the height in the ratio 2 : 1, so the radius is <span class=\"fr\"><span>3√3</span><span>3</span></span> = √3. The circle has area 3π. The answer is 9√3 − 3π."}, {"q": "If x + <span class=\"fr\"><span>1</span><span>x</span></span> = 5, what is the value of x<sup>3</sup> + <span class=\"fr\"><span>1</span><span>x<sup>3</sup></span></span>?", "o": ["125", "105", "100", "110", "115"], "a": 3, "s": "Cube both sides: (x + <span class=\"fr\"><span>1</span><span>x</span></span>)<sup>3</sup> = x<sup>3</sup> + <span class=\"fr\"><span>1</span><span>x<sup>3</sup></span></span> + 3(x + <span class=\"fr\"><span>1</span><span>x</span></span>). So 125 = x<sup>3</sup> + <span class=\"fr\"><span>1</span><span>x<sup>3</sup></span></span> + 3 · 5, and the answer is 125 − 15 = 110."}, {"q": "In how many different ways can the letters of the word LEVEL be arranged?", "o": ["120", "20", "24", "60", "30"], "a": 4, "s": "There are 5 letters, so 5! = 120 orders, but the two L's are identical and the two E's are identical. Divide by 2! · 2!: <span class=\"fr\"><span>120</span><span>4</span></span> = 30."}, {"q": "How many zeros are at the end of the number 125! (125 factorial)?", "o": ["31", "32", "25", "28", "30"], "a": 0, "s": "Each zero at the end comes from a factor 10 = 2 · 5, and there are many more 2s than 5s, so we count the 5s. Multiples of 5: 25. Multiples of 25 give an extra 5: 5 more. Multiple of 125: 1 more. Total 25 + 5 + 1 = 31."}, {"q": "The 3rd term of an arithmetic sequence is 10 and the 10th term is 31. What is the sum of the first 20 terms?", "o": ["600", "680", "620", "650", "700"], "a": 3, "s": "From the 3rd to the 10th term we add the common difference 7 times: 7d = 31 − 10 = 21, so d = 3 and the first term is 10 − 2 · 3 = 4. The 20th term is 4 + 19 · 3 = 61. The sum is <span class=\"fr\"><span>20</span><span>2</span></span> · (4 + 61) = 10 · 65 = 650."}, {"q": "What is the remainder when 7<sup>2026</sup> is divided by 100?", "o": ["57", "43", "7", "49", "1"], "a": 3, "s": "We only care about the last two digits. 7<sup>1</sup> = 7, 7<sup>2</sup> = 49, 7<sup>3</sup> = 343 → 43, 7<sup>4</sup> = 2401 → 01. The pattern repeats every 4 steps. 2026 = 4 · 506 + 2, so 7<sup>2026</sup> ends like 7<sup>2</sup>, that is, in 49."}, {"q": "A right triangle has legs of lengths 20 and 21. What is the length of the altitude drawn to the hypotenuse?", "o": ["<span class=\"fr\"><span>29</span><span>2</span></span>", "<span class=\"fr\"><span>420</span><span>29</span></span>", "14", "<span class=\"fr\"><span>210</span><span>29</span></span>", "15"], "a": 1, "s": "The hypotenuse is √(400 + 441) = √841 = 29. Compute the area in two ways: <span class=\"fr\"><span>1</span><span>2</span></span> · 20 · 21 = 210 and <span class=\"fr\"><span>1</span><span>2</span></span> · 29 · h. So 29h = 420 and h = <span class=\"fr\"><span>420</span><span>29</span></span>."}, {"q": "How many positive divisors of 720 are perfect squares?", "o": ["5", "9", "6", "4", "8"], "a": 2, "s": "720 = 2<sup>4</sup> · 3<sup>2</sup> · 5. A square divisor has even exponents: for 2 we can choose 0, 2 or 4 (3 ways), for 3 we can choose 0 or 2 (2 ways), for 5 only 0 (1 way). That gives 3 · 2 · 1 = 6 divisors: 1, 4, 9, 16, 36, 144."}, {"q": "How many ordered pairs of positive integers (x, y) satisfy <span class=\"fr\"><span>1</span><span>x</span></span> + <span class=\"fr\"><span>1</span><span>y</span></span> = <span class=\"fr\"><span>1</span><span>6</span></span>?", "o": ["9", "6", "12", "8", "10"], "a": 0, "s": "Multiply by 6xy: 6y + 6x = xy. Rearrange: xy − 6x − 6y + 36 = 36, that is (x − 6)(y − 6) = 36. Both brackets must be positive (if they were negative, x or y would not be positive), so each ordered pair corresponds to a divisor of 36. 36 has 9 divisors, so there are 9 pairs."}, {"q": "A circle in the first quadrant is tangent to both coordinate axes and passes through the point (2, 1). What is the sum of all possible radii of such a circle?", "o": ["6", "8", "4", "7", "5"], "a": 0, "s": "A circle tangent to both axes has center (r, r). The point (2, 1) lies on it: (r − 2)<sup>2</sup> + (r − 1)<sup>2</sup> = r<sup>2</sup>. This simplifies to r<sup>2</sup> − 6r + 5 = 0, so r = 1 or r = 5. By Vieta's formulas the sum is 6."}, {"q": "A positive divisor of 10<sup>6</sup> is chosen at random. What is the probability that it is a multiple of 100?", "o": ["<span class=\"fr\"><span>16</span><span>49</span></span>", "<span class=\"fr\"><span>25</span><span>49</span></span>", "<span class=\"fr\"><span>36</span><span>49</span></span>", "<span class=\"fr\"><span>1</span><span>2</span></span>", "<span class=\"fr\"><span>1</span><span>4</span></span>"], "a": 1, "s": "10<sup>6</sup> = 2<sup>6</sup> · 5<sup>6</sup>, so it has 7 · 7 = 49 divisors 2<sup>a</sup> · 5<sup>b</sup>. A multiple of 100 = 2<sup>2</sup> · 5<sup>2</sup> needs a ≥ 2 and b ≥ 2: 5 choices each, 25 divisors. The probability is <span class=\"fr\"><span>25</span><span>49</span></span>."}, {"q": "The polynomial x<sup>2</sup> − kx + 24 has two positive integer roots. What is the sum of all possible values of k?", "o": ["70", "65", "55", "50", "60"], "a": 4, "s": "By Vieta's formulas the roots multiply to 24 and add up to k. Factor pairs of 24: (1, 24), (2, 12), (3, 8), (4, 6), giving k = 25, 14, 11, 10. The sum is 60."}, {"q": "A regular hexagon has side length 2. Connecting every other vertex forms an equilateral triangle. What is the area of this triangle?", "o": ["4√3", "3√3", "2√3", "6√3", "3√2"], "a": 1, "s": "In a regular hexagon with side 2, the distance between two vertices with one vertex between them is 2√3 (it is twice the height of a small equilateral triangle with side 2). The triangle has side 2√3, so its area is <span class=\"fr\"><span>√3</span><span>4</span></span> · 12 = 3√3. This is exactly half of the hexagon's area 6√3."}, {"q": "How many four-digit numbers have digits that strictly increase from left to right (like 1359)?", "o": ["126", "252", "84", "210", "120"], "a": 0, "s": "The digit 0 cannot appear (it would have to be first). Any choice of 4 different digits from 1–9 can be arranged in increasing order in exactly one way. So the answer is C(9, 4) = 126."}, {"q": "For how many positive integers n ≤ 1000 is n<sup>2</sup> + n + 1 divisible by 7?", "o": ["288", "285", "284", "286", "287"], "a": 3, "s": "Check the remainders of n modulo 7: only n ≡ 2 (4 + 2 + 1 = 7) and n ≡ 4 (16 + 4 + 1 = 21) work. 1000 = 7 · 142 + 6, so each of the remainders 2 and 4 appears 143 times among 1, …, 1000. Total 2 · 143 = 286."}, {"q": "Square ABCD has side length 1. Point P is inside the square so that triangle APB is equilateral. What is the area of triangle PCD?", "o": ["<span class=\"fr\"><span>√3 − 1</span><span>4</span></span>", "<span class=\"fr\"><span>√3</span><span>4</span></span>", "<span class=\"fr\"><span>2 − √3</span><span>2</span></span>", "<span class=\"fr\"><span>2 − √3</span><span>4</span></span>", "<span class=\"fr\"><span>1</span><span>4</span></span>"], "a": 3, "s": "The height of the equilateral triangle APB is <span class=\"fr\"><span>√3</span><span>2</span></span>, so P is at distance <span class=\"fr\"><span>√3</span><span>2</span></span> from AB and at distance 1 − <span class=\"fr\"><span>√3</span><span>2</span></span> from CD. Triangle PCD has base CD = 1, so its area is <span class=\"fr\"><span>1</span><span>2</span></span> · (1 − <span class=\"fr\"><span>√3</span><span>2</span></span>) = <span class=\"fr\"><span>2 − √3</span><span>4</span></span>."}];
+const L = "ABCDE", TIME = 75*60;
+const SEND_TO = "tzhuravel1975@gmail.com";
+let ans = Array(Q.length).fill(null), cur = 0, left = TIME, tid = null, mode = "start", student = "", startedAt = null, report = "", sendState = "";
+const app = document.getElementById("app");
+const fmt = s => String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+
+function start(){
+  app.innerHTML = `<h1>AMC 10 Practice Test</h1><p class="sub">25 original problems in AMC 10 style · Тренажёр AMC 10: 25 оригинальных задач</p>
+  <div class="card"><b>Rules</b>
+  <ul class="rules">
+   <li>75 minutes, 25 multiple-choice questions, answers A–E. <span class="ru">75 минут, 25 вопросов.</span></li>
+   <li>Scoring: correct answer = 6 points, blank = 1.5 points, wrong answer = 0. Maximum 150. <span class="ru">Верно — 6, пропуск — 1,5, неверно — 0.</span></li>
+   <li>Problems get harder as you go. You can skip and come back. <span class="ru">Задачи по возрастанию сложности; можно пропускать и возвращаться.</span></li>
+   <li>Click a chosen answer again to make it blank. <span class="ru">Повторный клик снимает ответ.</span></li>
+  </ul>
+  ${SEND_TO?`<label style="display:block;margin-bottom:14px"><b>Your name</b> <span class="ru">· Ваше имя и фамилия</span><br>
+   <input id="nm" value="${student.replace(/"/g,"&quot;")}" style="font:inherit;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;width:100%;max-width:340px"></label>`:""}
+  <button class="btn pri" id="go">Start the test</button> <span id="nmerr" style="color:var(--bad);margin-left:8px"></span></div>`;
+  document.getElementById("go").onclick = () => {
+    if(SEND_TO){ student=document.getElementById("nm").value.trim(); if(!student){document.getElementById("nmerr").textContent="Please enter your name · Введите имя";return;} }
+    mode="test"; startedAt=new Date(); tid=setInterval(tick,1000); render(); };
+}
+function tick(){ left--; const t=document.getElementById("timer"); if(t){t.textContent=fmt(Math.max(left,0)); t.classList.toggle("low",left<300);} if(left<=0){finish();} }
+
+function gridHTML(review){
+  return `<div class="grid">${Q.map((q,i)=>{
+    let c = i===cur?" cur":"";
+    if(review) c += ans[i]===null?"":(ans[i]===q.a?" ok":" bad"); else if(ans[i]!==null) c+=" ans";
+    return `<button data-i="${i}" class="${c}">${i+1}</button>`}).join("")}</div>`;
+}
+function render(){
+  const review = mode==="review", q = Q[cur];
+  let verdict = "";
+  if(review){ verdict = ans[cur]===null ? `<span class="verdict" style="color:var(--blank)">Blank (1.5)</span>` : ans[cur]===q.a ? `<span class="verdict" style="color:var(--ok)">Correct (6)</span>` : `<span class="verdict" style="color:var(--bad)">Wrong (0)</span>`; }
+  app.innerHTML = `<div class="bar"><h1 style="font-size:24px;margin:0">AMC 10 Practice</h1>
+   ${review?`<button class="btn" id="back">Back to results</button>`:`<div class="timer" id="timer">${fmt(left)}</div>`}</div>
+   ${gridHTML(review)}
+   <div class="card"><div class="qnum">Problem ${cur+1} of ${Q.length}${verdict}</div>
+   <div class="qtext">${q.q}</div>
+   <div class="opts">${q.o.map((o,j)=>{
+     let c = "";
+     if(review){ if(j===q.a) c="right"; else if(ans[cur]===j) c="wrong"; }
+     else if(ans[cur]===j) c="sel";
+     return `<button class="opt ${c}" data-j="${j}"><span class="l">${L[j]}</span><span>${o}</span></button>`}).join("")}</div>
+   ${review?`<div class="sol"><h4>Solution · answer ${L[q.a]}</h4>${q.s}</div>`:""}
+   <div class="nav"><button class="btn" id="prev" ${cur===0?"disabled":""}>← Previous</button>
+   ${review?"":`<button class="btn pri" id="sub">Submit test</button>`}
+   <button class="btn" id="next" ${cur===Q.length-1?"disabled":""}>Next →</button></div></div>`;
+  app.querySelectorAll(".grid button").forEach(b=>b.onclick=()=>{cur=+b.dataset.i;render();});
+  if(!review) app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const j=+b.dataset.j; ans[cur]=ans[cur]===j?null:j; render();});
+  document.getElementById("prev").onclick=()=>{cur--;render();};
+  document.getElementById("next").onclick=()=>{cur++;render();};
+  if(review) document.getElementById("back").onclick=results;
+  else document.getElementById("sub").onclick=ask;
+}
+function ask(){
+  const blank = ans.filter(a=>a===null).length;
+  document.getElementById("mtext").innerHTML = `Submit the test now?${blank?` You have <b>${blank}</b> blank question${blank>1?"s":""}.`:""} <br><span class="ru">Сдать тест сейчас?</span>`;
+  document.getElementById("modal").classList.add("on");
+}
+document.getElementById("mno").onclick=()=>document.getElementById("modal").classList.remove("on");
+document.getElementById("myes").onclick=()=>{document.getElementById("modal").classList.remove("on");finish();};
+
+function finish(){
+  clearInterval(tid); mode="done";
+  if(SEND_TO){
+    const c = ans.filter((a,i)=>a===Q[i].a).length, b = ans.filter(a=>a===null).length, w = Q.length-c-b;
+    const lines = Q.map((q,i)=>`${i+1}. ${ans[i]===null?"—":L[ans[i]]} ${ans[i]===null?"(blank)":ans[i]===q.a?"✓":"✗ (correct "+L[q.a]+")"}`);
+    const used = fmt(TIME-Math.max(left,0));
+    report = `AMC 10 Practice Test\nStudent: ${student}\nScore: ${c*6+b*1.5} / 150\nCorrect: ${c}, Wrong: ${w}, Blank: ${b}\nTime used: ${used}${left<=0?" (time ran out)":""}\nStarted: ${startedAt.toLocaleString()}\n\n${lines.join("\n")}`;
+    sendState = "sending"; results();
+    fetch("https://formsubmit.co/ajax/"+SEND_TO,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+      body:JSON.stringify({_subject:`AMC 10 result: ${student} — ${c*6+b*1.5}/150`,_template:"box",_captcha:"false",
+        Student:student,Score:`${c*6+b*1.5} / 150`,Correct:c,Wrong:w,Blank:b,"Time used":used,Answers:lines.join("\n")})})
+     .then(r=>r.json()).then(j=>{sendState=(j.success==="true"||j.success===true)?"sent":"fail";results();})
+     .catch(()=>{sendState="fail";results();});
+  } else results();
+}
+function sendBox(){
+  if(!SEND_TO) return "";
+  if(sendState==="sending") return `<p class="ru">Sending results to the teacher… · Отправляем результат учителю…</p>`;
+  if(sendState==="sent") return `<p style="color:var(--ok);font-weight:600">✓ Results were sent to the teacher. · Результат отправлен учителю.</p>`;
+  return `<p style="color:var(--bad);font-weight:600">Results could not be sent automatically. Please copy them and send to the teacher. · Не удалось отправить — скопируйте и пришлите учителю.</p>
+   <textarea readonly style="width:100%;height:120px;font:13px monospace">${report}</textarea>
+   <button class="btn" id="cp">Copy results</button>`;
+}
+function results(){
+  mode="done";
+  const c = ans.filter((a,i)=>a===Q[i].a).length, b = ans.filter(a=>a===null).length, w = Q.length-c-b;
+  const score = c*6 + b*1.5, used = TIME-Math.max(left,0);
+  app.innerHTML = `<h1>Results</h1><p class="sub">Time used: ${fmt(used)} · Затраченное время</p>
+  ${sendBox()}
+  <div class="card"><div class="score">
+   <div class="stat"><b>${score}</b><span>score out of 150</span></div>
+   <div class="stat"><b style="color:var(--ok)">${c}</b><span>correct · верно</span></div>
+   <div class="stat"><b style="color:var(--bad)">${w}</b><span>wrong · неверно</span></div>
+   <div class="stat"><b style="color:var(--blank)">${b}</b><span>blank · пропущено</span></div></div>
+   <p class="ru" style="margin:10px 0 18px">Click a number to see the problem, the correct answer and the solution. · Нажмите на номер, чтобы увидеть решение.</p>
+   ${gridHTML(true).replace(/ cur/g,"")}
+   <b>Answer key</b><div class="key" style="margin-top:8px">${Q.map((q,i)=>`<div>${i+1}. <b>${L[q.a]}</b>${ans[i]!==null&&ans[i]!==q.a?` <span style="color:var(--bad)">(${L[ans[i]]})</span>`:""}</div>`).join("")}</div>
+   <div class="nav"><button class="btn" id="rv">Review solutions</button><button class="btn pri" id="again">Try again</button></div></div>`;
+  app.querySelectorAll(".grid button").forEach(b=>b.onclick=()=>{cur=+b.dataset.i;mode="review";render();});
+  document.getElementById("rv").onclick=()=>{cur=0;mode="review";render();};
+  document.getElementById("again").onclick=()=>{ans=Array(Q.length).fill(null);cur=0;left=TIME;mode="start";sendState="";start();};
+  const cp=document.getElementById("cp"); if(cp) cp.onclick=()=>{navigator.clipboard.writeText(report).then(()=>cp.textContent="Copied ✓").catch(()=>{});};
+}
+start();
+</script>
+</body>
+</html>
